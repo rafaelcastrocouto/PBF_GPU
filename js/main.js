@@ -17,9 +17,9 @@ import {fsPhongTriangles}       from './shaders/utils/fs-phongTriangles.js';
 
 let canvas = document.querySelector("#canvas3D");
 canvas.height = 1000;
-canvas.width = canvas.height * 2;
-canvas.style.width = String(canvas.width) + "px";
-canvas.style.height = String(canvas.height) + "px";
+canvas.width = canvas.height;
+//canvas.style.width = String(canvas.width) + "px";
+//canvas.style.height = String(canvas.height) + "px";
 webGL2.setContext(canvas);
 
 
@@ -31,9 +31,9 @@ let FOV = 30;
 let updateSimulation = true;
 let deltaTime = 0.01;
 let constrainsIterations = 2;
-let pbfResolution = 64;
-let voxelTextureSize = 512;
-let particlesTextureSize = 1000;
+let pbfResolution = 32;
+let voxelTextureSize = 1048;
+let particlesTextureSize = 512;
 let particlesPosition = [];
 let particlesVelocity = []
 let currentFrame = 0;
