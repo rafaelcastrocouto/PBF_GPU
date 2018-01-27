@@ -101,7 +101,7 @@ void main() {
 
     //Collision handling
     vec3 center = vec3(uBucketData.y * 0.5);
-    float radius = uBucketData.y * 0.4;
+    float radius = uBucketData.y * 0.49;
     vec3 normal = endPosition - center;
     float n = length(normal);
     float distance = n -  radius;
@@ -114,7 +114,7 @@ void main() {
     }
 
     // //Collision handling
-    // vec3 boxSize = vec3(uBucketData.y * 0.46);
+    // vec3 boxSize = vec3(uBucketData.y * 0.48);
     // vec3 xLocal = endPosition - center;
     // vec3 contactPointLocal = min(boxSize, max(-boxSize, xLocal));
     // vec3 contactPoint = contactPointLocal + center;

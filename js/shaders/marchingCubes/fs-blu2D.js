@@ -38,4 +38,3 @@ void main(void) {
 
 export {blur2D}
 
-

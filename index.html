@@ -1,28 +1,33 @@
 <!DOCTYPE html>
 <html>
-  <head lang="en">
+<head lang="en">
     <meta charset="UTF-8">
     <title>Position Based Fluids (GPU)</title>
-  </head>
-  <style>
-    html, body {
-      height: 100%;
-    }
+</head>
+<script src="js/libs/datGui/dat.gui.js"></script>
+<script src="js/webGL/gl-matrix.js"></script>
+<script type="module" src="js/raytracer.js"></script>
+
+<style>
 
     body {
-      background-color: #000;
+        margin-left: 0px;
+        margin-top: 0px;
+        background-color: #000000;
     }
 
-    canvas {
-      width: 100vh;
-      height: 100vh;
-      display: block;
-      margin: 0 auto;
+    .uiContainer {
+        position: absolute;
+        top: 20px;
+        left: 20px;
     }
-  </style>
-  <body>
+
+</style>
+
+<body>
     <canvas id="canvas3D"></canvas>
-    <script src="js/utils/gl-matrix.js"></script>
-    <script src="js/bundle.js"></script>
-  </body>
+</body>
+
+<div class = "uiContainer"></div>
+
 </html>
