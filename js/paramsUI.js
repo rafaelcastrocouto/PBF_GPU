@@ -7,7 +7,7 @@ DatGUI
 
 export function startUIParams(params) {
 
-    let uiContainer = document.querySelector(".uiContainer");
+    let uiContainer = document.querySelector("#uiContainer");
 
     //Simulation UI
     let simulationUI = new dat.GUI({ autoPlace: false });

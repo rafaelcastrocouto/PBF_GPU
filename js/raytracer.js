@@ -13,8 +13,9 @@ import {startUIParams}          from './paramsUI.js';
 
 //Set the canvas
 let canvas = document.querySelector("#canvas3D");
-canvas.height = 700;
-canvas.width = canvas.height * 2.;
+const size = 400;
+canvas.height = size;
+canvas.width = canvas.height;
 canvas.style.width = String(canvas.width) + "px";
 canvas.style.height = String(canvas.height) + "px";
 webGL2.setContext(canvas);
@@ -443,11 +444,11 @@ let render = () => {
     }
 
     //Check the simulation
-    renderParticles(0, 0, 700, 700, null, true);
+    //renderParticles(0, 0, 700, 700, null, true);
 
     //Checking texture results
-    checkTexture(tScene2, 700, 0, 700, 700, null, false, true);
-
+    //checkTexture(tScene2, 700, 0, 700, 700, null, false, true);
+    checkTexture(tScene2, 0, 0, size, size, null, false, true);
 };
 
 render();

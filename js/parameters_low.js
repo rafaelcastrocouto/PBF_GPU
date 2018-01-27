@@ -7,26 +7,26 @@ export class Params {
         this.resetSimulation = resetSimulation;
 
         //Camera parameters
-        this.cameraDistance = 3.;
+        this.cameraDistance = 2.8;
         this.FOV = 30;
         this.lockCamera = false;
 
         //Position based fluids parameters
         this.updateSimulation = true;
-        this.deltaTime = 0.01;
+        this.deltaTime = 0.2;
         this.constrainsIterations = 5;
-        this.pbfResolution = 128;
+        this.pbfResolution = 64;
         this.voxelTextureSize = 2048;
         this.particlesTextureSize = 1000;
 
         //Marching cubes parameters, Change these values to change marching cubes resolution (128/2048/1024 or 256/4096/2048)
-        this.resolution = 256;
-        this.expandedTextureSize = 4096;
-        this.expandedBuckets = 16;
-        this.compressedTextureSize = 2048;
-        this.compressedBuckets = 8;
-        this.depthLevels = 64;
-        this.compactTextureSize = 2500;
+        this.resolution = 64;
+        this.expandedTextureSize = 512;
+        this.expandedBuckets = 8;
+        this.compressedTextureSize = 256;
+        this.compressedBuckets = 4;
+        this.depthLevels = 16;
+        this.compactTextureSize = 2048;
         this.particleSize = 2;
         this.blurSteps = 24;
         this.range = 0.1;
@@ -38,15 +38,15 @@ export class Params {
         this.lowResolutionTextureSize = 256;
         this.lowGridPartitions = 32;
         this.lowSideBuckets = 8;
-        this.sceneSize = 2048;       //Requires to be a power of two for mip mapping
-        this.floorTextureSize = 2048;
+        this.sceneSize = 256;       //Requires to be a power of two for mip mapping
+        this.floorTextureSize = 256;
         this.floorScale = 5;
         this.killRay = 0.02;
         this.updateImage = true;
 
         //Material parameters (dielectric)
         this.refraction = 1.2;
-        this.maxIterations = 600.;
+        this.maxIterations = 600;
         this.refractions = 8;
         this.reflections = 3;
         this.maxStepsPerBounce = 800;
@@ -75,13 +75,13 @@ export class Params {
         //Caustics parameters
         this.photonSize = 2;
         this.photonEnergy = 0.2;
-        this.reflectionPhotons = 0.;
+        this.reflectionPhotons = 0;
         this.photonsToEmit = 1;
         this.photonSteps = 1;
         this.radianceRadius = 5.6;
         this.radiancePower = 0.2;
         this.calculateCaustics = true;
-        this.causticsSize = 1000;
+        this.causticsSize = 512;
         this.totalPhotons = this.causticsSize * this.causticsSize;
         this.causticSteps = 0;
 
