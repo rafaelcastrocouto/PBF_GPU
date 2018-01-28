@@ -4384,9 +4384,9 @@ class Params {
         this.compressedBuckets = 4;
         this.depthLevels = 16;
         this.compactTextureSize = 1024;
-        this.particleSize = 2;
+        this.particleSize = 3;
         this.blurSteps = 10;
-        this.range = 0.16;
+        this.range = 0.34;
         this.maxCells = 3.2;
         this.fastNormals = false;
         this.updateMesh = true;
