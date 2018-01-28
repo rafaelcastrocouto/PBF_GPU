@@ -357,7 +357,7 @@ __WEBPACK_IMPORTED_MODULE_3__shaders_js__["g" /* init */]();
 
 let camera = new __WEBPACK_IMPORTED_MODULE_5__camera_js__["a" /* Camera */](canvas);
 
-var stats = new Stats();
+let stats = new Stats();
 stats.showPanel( 0 ); // 0: fps, 1: ms, 2: mb, 3+: custom
 document.body.appendChild( stats.dom );
 
@@ -424,7 +424,7 @@ __WEBPACK_IMPORTED_MODULE_0__webGL_webGL2_js__["e" /* gl */].bindTexture(__WEBPA
 
 
 //Initiate the position based fluids solver
-__WEBPACK_IMPORTED_MODULE_1__positionBasedFluids_pbf_js__["a" /* init */](particlesData.particlesPosition, particlesData.particlesVelocity, params.pbfResolution, params.voxelTextureSize, params.particlesTextureSize);
+__WEBPACK_IMPORTED_MODULE_1__positionBasedFluids_pbf_js__["a" /* init */](particlesData.particlesPosition, particlesData.particlesVelocity, params.pbfResolution, Math.ceil(Math.sqrt(Math.pow(params.resolution, 3))), Math.ceil(Math.sqrt(params.totalParticles)));
 
 //Initiate the mesher generator
 __WEBPACK_IMPORTED_MODULE_2__marchingCubes_mesher_js__["c" /* init */](params.resolution, params.expandedTextureSize, params.compressedTextureSize, params.compactTextureSize, params.compressedBuckets, params.expandedBuckets, params.depthLevels);
@@ -510,7 +510,7 @@ let render = () => {
     if (params.updateSimulation) {
 
         //Update the simulation
-        __WEBPACK_IMPORTED_MODULE_1__positionBasedFluids_pbf_js__["e" /* updateFrame */](acceleration, params.deltaTime, params.constrainsIterations);
+        __WEBPACK_IMPORTED_MODULE_1__positionBasedFluids_pbf_js__["e" /* updateFrame */](acceleration, params.deltaTime, params.constrainsIterations, 1.8 * camera.alpha / (2 * Math.PI));
 
         currentFrame++;
     }
@@ -1215,11 +1215,11 @@ const vsNeighbors = `#version 300 es
         vec3 gridPosition = floor(texture(uTexPositions, vec2(float(gl_VertexID % size) + 0.5, (floor(float(gl_VertexID) + 0.5) / fSize)) / fSize).rgb);
 
         //This voxel position calculation serializes the 3D position relative to the texture size, it's independent of a mayor axis
-        //float gridIndex = dot(gridPosition, vec3(1., uBucketData.y, uBucketData.y * uBucketData.y));
-        //vec2 voxelPosition = 2. * ((vec2(mod(gridIndex, uBucketData.x), floor(gridIndex / uBucketData.x)) + vec2(0.5)) / uBucketData.x) - vec2(1.);
+        float gridIndex = dot(gridPosition, vec3(1., uBucketData.y, uBucketData.y * uBucketData.y));
+        vec2 voxelPosition = 2. * ((vec2(mod(gridIndex, uBucketData.x), floor(gridIndex / uBucketData.x)) + vec2(0.5)) / uBucketData.x) - vec2(1.);
 
         //This voxel position is relative to the mayor (depth) axis, good for visualization.
-        vec2 voxelPosition =  2. * (gridPosition.zy + uBucketData.y * vec2(mod(gridPosition.x, uBucketData.z), floor(gridPosition.x / uBucketData.z)) + vec2(0.5)) / uBucketData.x - vec2(1.);
+        //vec2 voxelPosition =  2. * (gridPosition.zy + uBucketData.y * vec2(mod(gridPosition.x, uBucketData.z), floor(gridPosition.x / uBucketData.z)) + vec2(0.5)) / uBucketData.x - vec2(1.);
 
         if(gridPosition.y < 0.) voxelPosition = vec2(1e10);
         gl_Position = vec4(voxelPosition, float(gl_VertexID) / uTotalParticles, 1.0);
@@ -1399,9 +1399,9 @@ void main() {
     for(int i = 0; i < 27; i ++) {
 
         vec3 neighborsVoxel = gridPosition + offsets[i];
-        vec2 voxelsIndex =  (neighborsVoxel.zy + uBucketData.y * vec2(mod(neighborsVoxel.x, uBucketData.z), floor(neighborsVoxel.x / uBucketData.z)) + vec2(0.5)) / uBucketData.x;
-        //float gridIndex = dot(neighborsVoxel, vec3(1., uBucketData.y, uBucketData.y * uBucketData.y));
-        //vec2 voxelsIndex = (vec2(mod(gridIndex, uBucketData.x), floor(gridIndex / uBucketData.x)) + vec2(0.5)) / uBucketData.x;
+        //vec2 voxelsIndex =  (neighborsVoxel.zy + uBucketData.y * vec2(mod(neighborsVoxel.x, uBucketData.z), floor(neighborsVoxel.x / uBucketData.z)) + vec2(0.5)) / uBucketData.x;
+        float gridIndex = dot(neighborsVoxel, vec3(1., uBucketData.y, uBucketData.y * uBucketData.y));
+        vec2 voxelsIndex = (vec2(mod(gridIndex, uBucketData.x), floor(gridIndex / uBucketData.x)) + vec2(0.5)) / uBucketData.x;
         vec4 neighbors = texture(uNeighbors, voxelsIndex);
 
         if(neighbors.r > 0.) addToSum(particlePosition, neighbors.r, density, sum_k_grad_Ci, grad_pi_Ci);
@@ -1437,6 +1437,7 @@ uniform sampler2D uTexturePosition;
 uniform sampler2D uNeighbors;
 uniform sampler2D uConstrains;
 uniform vec3  uBucketData;
+uniform float uMouseShake;
 uniform float uSearchRadius;
 uniform float uRestDensity;
 uniform float uGradientKernelConstant;
@@ -1516,9 +1517,9 @@ void main() {
     for(int i = 0; i < 27; i ++) {
 
         vec3 neighborsVoxel = gridPosition + offsets[i];
-        vec2 voxelsIndex =  (neighborsVoxel.zy + uBucketData.y * vec2(mod(neighborsVoxel.x, uBucketData.z), floor(neighborsVoxel.x / uBucketData.z)) + vec2(0.5)) / uBucketData.x;
-        //float gridIndex = dot(neighborsVoxel, vec3(1., uBucketData.y, uBucketData.y * uBucketData.y));
-        //vec2 voxelsIndex = (vec2(mod(gridIndex, uBucketData.x), floor(gridIndex / uBucketData.x)) + vec2(0.5)) / uBucketData.x;
+        //vec2 voxelsIndex =  (neighborsVoxel.zy + uBucketData.y * vec2(mod(neighborsVoxel.x, uBucketData.z), floor(neighborsVoxel.x / uBucketData.z)) + vec2(0.5)) / uBucketData.x;
+        float gridIndex = dot(neighborsVoxel, vec3(1., uBucketData.y, uBucketData.y * uBucketData.y));
+        vec2 voxelsIndex = (vec2(mod(gridIndex, uBucketData.x), floor(gridIndex / uBucketData.x)) + vec2(0.5)) / uBucketData.x;
         vec4 neighbors = texture(uNeighbors, voxelsIndex);
 
         if(neighbors.r > 0.) addToSum(particlePosition, neighbors.r, lambdaPressure, deltaPosition);
@@ -1530,8 +1531,9 @@ void main() {
     vec3 endPosition = particlePosition + (uGradientKernelConstant / uRestDensity) * deltaPosition;
 
     //Collision handling
-    vec3 center = vec3(uBucketData.y * 0.5);
-    float radius = uBucketData.y * 0.49;
+    vec3 center = vec3(uBucketData.y * 0.5) + vec3(0., uMouseShake * uBucketData.y, 0.);
+
+    float radius = float(uBucketData.y) * 0.19;
     vec3 normal = endPosition - center;
     float n = length(normal);
     float distance = n -  radius;
@@ -1638,9 +1640,9 @@ void main() {
     for(int i = 0; i < 27; i ++) {
 
         vec3 neighborsVoxel = gridPosition + offsets[i];
-        vec2 voxelsIndex =  (neighborsVoxel.zy + uBucketData.y * vec2(mod(neighborsVoxel.x, uBucketData.z), floor(neighborsVoxel.x / uBucketData.z)) + vec2(0.5)) / uBucketData.x;
-        //float gridIndex = dot(neighborsVoxel, vec3(1., uBucketData.y, uBucketData.y * uBucketData.y));
-        //vec2 voxelsIndex = (vec2(mod(gridIndex, uBucketData.x), floor(gridIndex / uBucketData.x)) + vec2(0.5)) / uBucketData.x;
+        //vec2 voxelsIndex =  (neighborsVoxel.zy + uBucketData.y * vec2(mod(neighborsVoxel.x, uBucketData.z), floor(neighborsVoxel.x / uBucketData.z)) + vec2(0.5)) / uBucketData.x;
+        float gridIndex = dot(neighborsVoxel, vec3(1., uBucketData.y, uBucketData.y * uBucketData.y));
+        vec2 voxelsIndex = (vec2(mod(gridIndex, uBucketData.x), floor(gridIndex / uBucketData.x)) + vec2(0.5)) / uBucketData.x;
         vec4 neighbors = texture(uNeighbors, voxelsIndex);
 
         if(neighbors.r > 0.) addToSum(particlePosition, neighbors.r, particleVelocity, deltaVelocity);
@@ -4376,8 +4378,8 @@ class Params {
         this.updateSimulation = true;
         this.deltaTime = 0.06;
         this.constrainsIterations = 5;
-        this.pbfResolution = 16;
-        this.voxelTextureSize = 256;
+        this.pbfResolution = 32;
+        this.voxelTextureSize = 512;
         this.particlesTextureSize = 256;
 
         //Marching cubes parameters, Change these values to change marching cubes resolution (128/2048/1024 or 256/4096/2048)
@@ -4451,10 +4453,10 @@ class Params {
     //Generate the particles, this is done here to have different particles setup in
     //different params files
     generateParticles() {
-
+        this.totalParticles = 0;
         let particlesPosition = [];
         let particlesVelocity = [];
-        let radius = this.pbfResolution * 0.45;
+        let radius = this.pbfResolution * 0.25;
         //Generate the position and velocity
         for (let i = 0; i < this.pbfResolution; i++) {
             for (let j = 0; j < this.pbfResolution; j++) {
@@ -4462,12 +4464,13 @@ class Params {
 
                     //Condition for the particle position and existence
                     let x = i - this.pbfResolution * 0.5;
-                    let y = j - this.pbfResolution * 0.5;
+                    let y = j - this.pbfResolution * 0.7;
                     let z = k - this.pbfResolution * 0.5;
 
                     if (x * x + y * y + z * z < radius * radius && k < this.pbfResolution * 0.4) {
                         particlesPosition.push(i, j, k, 1);
                         particlesVelocity.push(0, 0, 0, 0);
+                        this.totalParticles++;
                     }
                 }
             }

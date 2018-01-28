@@ -7,6 +7,7 @@ uniform sampler2D uTexturePosition;
 uniform sampler2D uNeighbors;
 uniform sampler2D uConstrains;
 uniform vec3  uBucketData;
+uniform float uMouseShake;
 uniform float uSearchRadius;
 uniform float uRestDensity;
 uniform float uGradientKernelConstant;
@@ -86,9 +87,9 @@ void main() {
     for(int i = 0; i < 27; i ++) {
 
         vec3 neighborsVoxel = gridPosition + offsets[i];
-        vec2 voxelsIndex =  (neighborsVoxel.zy + uBucketData.y * vec2(mod(neighborsVoxel.x, uBucketData.z), floor(neighborsVoxel.x / uBucketData.z)) + vec2(0.5)) / uBucketData.x;
-        //float gridIndex = dot(neighborsVoxel, vec3(1., uBucketData.y, uBucketData.y * uBucketData.y));
-        //vec2 voxelsIndex = (vec2(mod(gridIndex, uBucketData.x), floor(gridIndex / uBucketData.x)) + vec2(0.5)) / uBucketData.x;
+        //vec2 voxelsIndex =  (neighborsVoxel.zy + uBucketData.y * vec2(mod(neighborsVoxel.x, uBucketData.z), floor(neighborsVoxel.x / uBucketData.z)) + vec2(0.5)) / uBucketData.x;
+        float gridIndex = dot(neighborsVoxel, vec3(1., uBucketData.y, uBucketData.y * uBucketData.y));
+        vec2 voxelsIndex = (vec2(mod(gridIndex, uBucketData.x), floor(gridIndex / uBucketData.x)) + vec2(0.5)) / uBucketData.x;
         vec4 neighbors = texture(uNeighbors, voxelsIndex);
 
         if(neighbors.r > 0.) addToSum(particlePosition, neighbors.r, lambdaPressure, deltaPosition);
@@ -100,8 +101,9 @@ void main() {
     vec3 endPosition = particlePosition + (uGradientKernelConstant / uRestDensity) * deltaPosition;
 
     //Collision handling
-    vec3 center = vec3(uBucketData.y * 0.5);
-    float radius = uBucketData.y * 0.49;
+    vec3 center = vec3(uBucketData.y * 0.5) + vec3(0., uMouseShake * uBucketData.y, 0.);
+
+    float radius = float(uBucketData.y) * 0.19;
     vec3 normal = endPosition - center;
     float n = length(normal);
     float distance = n -  radius;

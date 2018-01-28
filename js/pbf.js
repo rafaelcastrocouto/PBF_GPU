@@ -122,6 +122,7 @@ let init = (particlesPosition, particlesVelocity, _bucketSize, _voxelsTextureSiz
     calculateDisplacementsProgram.neighbors                 = gl.getUniformLocation(calculateDisplacementsProgram, "uNeighbors");
     calculateDisplacementsProgram.constrains                = gl.getUniformLocation(calculateDisplacementsProgram, "uConstrains");
     calculateDisplacementsProgram.bucketData                = gl.getUniformLocation(calculateDisplacementsProgram, "uBucketData");
+    calculateDisplacementsProgram.mouseShake                = gl.getUniformLocation(calculateDisplacementsProgram, "uMouseShake");
     calculateDisplacementsProgram.restDensity               = gl.getUniformLocation(calculateDisplacementsProgram, "uRestDensity");
     calculateDisplacementsProgram.searchRadius              = gl.getUniformLocation(calculateDisplacementsProgram, "uSearchRadius");
     calculateDisplacementsProgram.gradientKernelConstant    = gl.getUniformLocation(calculateDisplacementsProgram, "uGradientKernelConstant");
@@ -161,7 +162,7 @@ let init = (particlesPosition, particlesVelocity, _bucketSize, _voxelsTextureSiz
 // Simulation and Rendering (Particle Based Fluids
 //=======================================================================================================
 
-let updateFrame = (acceleration, deltaTime, constrainsIterations) => {
+let updateFrame = (acceleration, deltaTime, constrainsIterations, cameraY) => {
 
     //Apply external forces (gravity)
     gl.bindFramebuffer(gl.DRAW_FRAMEBUFFER, pbfBuffer1);
@@ -206,6 +207,7 @@ let updateFrame = (acceleration, deltaTime, constrainsIterations) => {
         webGL2.bindTexture(calculateDisplacementsProgram.neighbors, voxelsTexture, 1);
         webGL2.bindTexture(calculateDisplacementsProgram.constrains, pbfTexture2, 2);
         gl.uniform3f(calculateDisplacementsProgram.bucketData, voxelsTexture.width, bucketSize, voxelsTexture.width / bucketSize);
+        gl.uniform1f(calculateDisplacementsProgram.mouseShake, cameraY);
         gl.uniform1f(calculateDisplacementsProgram.restDensity, restDensity);
         gl.uniform1f(calculateDisplacementsProgram.searchRadius, searchRadius);
         gl.uniform1f(calculateDisplacementsProgram.gradientKernelConstant, gradWconstant);

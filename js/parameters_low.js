@@ -15,8 +15,8 @@ export class Params {
         this.updateSimulation = true;
         this.deltaTime = 0.06;
         this.constrainsIterations = 5;
-        this.pbfResolution = 16;
-        this.voxelTextureSize = 256;
+        this.pbfResolution = 32;
+        this.voxelTextureSize = 512;
         this.particlesTextureSize = 256;
 
         //Marching cubes parameters, Change these values to change marching cubes resolution (128/2048/1024 or 256/4096/2048)
@@ -90,10 +90,10 @@ export class Params {
     //Generate the particles, this is done here to have different particles setup in
     //different params files
     generateParticles() {
-
+        this.totalParticles = 0;
         let particlesPosition = [];
         let particlesVelocity = [];
-        let radius = this.pbfResolution * 0.45;
+        let radius = this.pbfResolution * 0.25;
         //Generate the position and velocity
         for (let i = 0; i < this.pbfResolution; i++) {
             for (let j = 0; j < this.pbfResolution; j++) {
@@ -101,12 +101,13 @@ export class Params {
 
                     //Condition for the particle position and existence
                     let x = i - this.pbfResolution * 0.5;
-                    let y = j - this.pbfResolution * 0.5;
+                    let y = j - this.pbfResolution * 0.7;
                     let z = k - this.pbfResolution * 0.5;
 
                     if (x * x + y * y + z * z < radius * radius && k < this.pbfResolution * 0.4) {
                         particlesPosition.push(i, j, k, 1);
                         particlesVelocity.push(0, 0, 0, 0);
+                        this.totalParticles++;
                     }
                 }
             }

@@ -36,7 +36,7 @@ Programs.init();
 
 let camera = new Camera(canvas);
 
-var stats = new Stats();
+let stats = new Stats();
 stats.showPanel( 0 ); // 0: fps, 1: ms, 2: mb, 3+: custom
 document.body.appendChild( stats.dom );
 
@@ -103,7 +103,7 @@ gl.bindTexture(gl.TEXTURE_2D, null);
 
 
 //Initiate the position based fluids solver
-PBF.init(particlesData.particlesPosition, particlesData.particlesVelocity, params.pbfResolution, params.voxelTextureSize, params.particlesTextureSize);
+PBF.init(particlesData.particlesPosition, particlesData.particlesVelocity, params.pbfResolution, Math.ceil(Math.sqrt(Math.pow(params.resolution, 3))), Math.ceil(Math.sqrt(params.totalParticles)));
 
 //Initiate the mesher generator
 Mesher.init(params.resolution, params.expandedTextureSize, params.compressedTextureSize, params.compactTextureSize, params.compressedBuckets, params.expandedBuckets, params.depthLevels);
@@ -189,7 +189,7 @@ let render = () => {
     if (params.updateSimulation) {
 
         //Update the simulation
-        PBF.updateFrame(acceleration, params.deltaTime, params.constrainsIterations);
+        PBF.updateFrame(acceleration, params.deltaTime, params.constrainsIterations, 1.8 * camera.alpha / (2 * Math.PI));
 
         currentFrame++;
     }
