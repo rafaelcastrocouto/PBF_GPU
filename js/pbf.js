@@ -47,7 +47,7 @@ let positionBuffer,
     voxelsBuffer;
 
 
-let restDensity = 1000;
+let restDensity = 10;
 let searchRadius = 1.8;
 let relaxParameter = .05;  //<<<------------------------------------------- this is very sensible
 let tensileConstant = 40;

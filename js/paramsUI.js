@@ -11,21 +11,22 @@ export function startUIParams(params) {
 
     //Simulation UI
     let simulationUI = new dat.GUI({ autoPlace: false });
-    simulationUI.domElement.style.display = "none";
+    //simulationUI.domElement.style.display = "none";
     uiContainer.appendChild(simulationUI.domElement);
     let simulationParamsActive = false;
 
+    simulationUI.add(params, "resetSimulation");
     //For the position based fluids
     let  pbfFolder = simulationUI.addFolder('Position Based Fluids');
     pbfFolder.add(params, "deltaTime", 0.0000, 1, 0.0001).name("simulation speed");
     pbfFolder.add(params, "constrainsIterations", 1, 10, 1).name("constrains iterations").step(1);
     pbfFolder.add(params, "updateSimulation").name("update simulation");
-    pbfFolder.add(params, "resetSimulation");
 
     pbfFolder.open();
 
     //For the mesh generation
     let meshFolder = simulationUI.addFolder('Marching Cubes');
+    meshFolder.add(params, "factor", 1, 10, 1).name("factor").step(1);
     meshFolder.add(params, "particleSize", 1, 10, 1).name("particle size").step(1);
     meshFolder.add(params, "blurSteps", 1, 100, 1).name("blur steps").step(1);
     meshFolder.add(params, "range", 0, 1, 0.001).name("range").step(0.001);
@@ -36,8 +37,9 @@ export function startUIParams(params) {
 
 
     //material UI
-    let materialUI = new dat.GUI({ autoPlace: false });
-    materialUI.domElement.style.display = "none";
+    //let materialUI = new dat.GUI({ autoPlace: false });
+    let materialUI = simulationUI;
+    //materialUI.domElement.style.display = "none";
     uiContainer.appendChild(materialUI.domElement);
     let materialUIActive = false;
 
@@ -65,12 +67,11 @@ export function startUIParams(params) {
 
 
     //raytracer UI
-    let raytracerUI = new dat.GUI({ autoPlace: false });
-    raytracerUI.domElement.style.display = "none";
+    //let raytracerUI = new dat.GUI({ autoPlace: false });
+    let raytracerUI = simulationUI;
+    //raytracerUI.domElement.style.display = "none";
     uiContainer.appendChild(raytracerUI.domElement);
     let raytracerUiActive = false;
-
-
 
 
     //General raytracer folder
@@ -84,8 +85,8 @@ export function startUIParams(params) {
 
     //Light parameters folder
     let lightFolder = raytracerUI.addFolder('Light parameters');
-    lightFolder.add(params, "lightAlpha", 0, 180, 1).name("light alpha").step(1);
-    lightFolder.add(params, "lightBeta", 0, 180, 1).name("light beta").step(1);
+    lightFolder.add(params, "lightAlpha", 0, 360, 1).name("light alpha").step(1);
+    lightFolder.add(params, "lightBeta", 0, 360, 1).name("light beta").step(1);
     lightFolder.add(params, "lightDistance", 0, 20, 1).name("light distance").step(1);
     lightFolder.add(params, "backgroundColor", 0, 1, 0.01).name("background color").step(0.01);
     lightFolder.add(params, "shadowIntensity", 0, 1, 0.01).name("shadows intensity").step(0.01);
@@ -108,9 +109,9 @@ export function startUIParams(params) {
 
        if(e.key == "p") {
            simulationParamsActive = !simulationParamsActive;
-           simulationUI.domElement.style.display = simulationParamsActive ? "block" : "none";
+           uiContainer.style.display = simulationParamsActive ? "block" : "none";
        }
-
+/*
         if(e.key == "m") {
             materialUIActive = !materialUIActive;
             materialUI.domElement.style.display = materialUIActive ? "block" : "none";
@@ -120,7 +121,7 @@ export function startUIParams(params) {
             raytracerUiActive = !raytracerUiActive;
             raytracerUI.domElement.style.display = raytracerUiActive ? "block" : "none";
         }
-
+*/
     });
 
 }

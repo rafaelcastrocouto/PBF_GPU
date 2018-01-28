@@ -36,6 +36,10 @@ Programs.init();
 
 let camera = new Camera(canvas);
 
+var stats = new Stats();
+stats.showPanel( 0 ); // 0: fps, 1: ms, 2: mb, 3+: custom
+document.body.appendChild( stats.dom );
+
 //Generate random positions for the photons
 let arrayRays = [];
 for (let i = 0; i < params.totalPhotons; i++) arrayRays.push(Math.random(), Math.random(), Math.random(), i);
@@ -160,7 +164,7 @@ gl.blendFunc(gl.ONE, gl.ONE);
 
 let currentFrame = 0;
 let render = () => {
-
+    stats.begin();
     requestAnimationFrame(render);
 
     if(!params.lockCamera) camera.updateCamera(params.FOV, 1, params.cameraDistance);
@@ -447,8 +451,8 @@ let render = () => {
     renderParticles(0, 0, size, size, null, true);
 
     //Checking texture results
-    //checkTexture(tScene2, 700, 0, 700, 700, null, false, true);
     checkTexture(tScene2, size, 0, size, size, null, false, true);
+    stats.end();
 };
 
 render();

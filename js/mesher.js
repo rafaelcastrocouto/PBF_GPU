@@ -29,8 +29,8 @@ let compactTextureSize;
 let compressedBuckets;
 let expandedBuckets;
 let depthLevels;
-const amountOfTrianglesTextureSize = 16;
-const indexesTextureSize = 64;
+const amountOfTrianglesTextureSize = 8;
+const indexesTextureSize = 16;
 
 
 //Textures required

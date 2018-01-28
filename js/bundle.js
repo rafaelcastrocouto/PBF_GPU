@@ -357,6 +357,10 @@ __WEBPACK_IMPORTED_MODULE_3__shaders_js__["g" /* init */]();
 
 let camera = new __WEBPACK_IMPORTED_MODULE_5__camera_js__["a" /* Camera */](canvas);
 
+var stats = new Stats();
+stats.showPanel( 0 ); // 0: fps, 1: ms, 2: mb, 3+: custom
+document.body.appendChild( stats.dom );
+
 //Generate random positions for the photons
 let arrayRays = [];
 for (let i = 0; i < params.totalPhotons; i++) arrayRays.push(Math.random(), Math.random(), Math.random(), i);
@@ -481,7 +485,7 @@ __WEBPACK_IMPORTED_MODULE_0__webGL_webGL2_js__["e" /* gl */].blendFunc(__WEBPACK
 
 let currentFrame = 0;
 let render = () => {
-
+    stats.begin();
     requestAnimationFrame(render);
 
     if(!params.lockCamera) camera.updateCamera(params.FOV, 1, params.cameraDistance);
@@ -768,8 +772,8 @@ let render = () => {
     renderParticles(0, 0, size, size, null, true);
 
     //Checking texture results
-    //checkTexture(tScene2, 700, 0, 700, 700, null, false, true);
     checkTexture(tScene2, size, 0, size, size, null, false, true);
+    stats.end();
 };
 
 render();
@@ -4364,29 +4368,30 @@ class Params {
         this.resetSimulation = resetSimulation;
 
         //Camera parameters
-        this.cameraDistance = 2.6;
+        this.cameraDistance = 3;
         this.FOV = 30;
         this.lockCamera = false;
 
         //Position based fluids parameters
         this.updateSimulation = true;
-        this.deltaTime = 0.036;
+        this.deltaTime = 0.06;
         this.constrainsIterations = 5;
-        this.pbfResolution = 32;
-        this.voxelTextureSize = 2048;
+        this.pbfResolution = 16;
+        this.voxelTextureSize = 256;
         this.particlesTextureSize = 256;
 
         //Marching cubes parameters, Change these values to change marching cubes resolution (128/2048/1024 or 256/4096/2048)
-        this.resolution = 64;
-        this.expandedTextureSize = 512;
-        this.expandedBuckets = 8;
-        this.compressedTextureSize = 256;
-        this.compressedBuckets = 4;
-        this.depthLevels = 16;
-        this.compactTextureSize = 1024;
-        this.particleSize = 3;
-        this.blurSteps = 10;
-        this.range = 0.34;
+        this.factor = 8;
+        this.resolution = 8 * this.factor;
+        this.expandedTextureSize = 64 * this.factor;
+        this.expandedBuckets = this.factor;
+        this.compressedTextureSize = 32 * this.factor;
+        this.compressedBuckets = this.factor/2;
+        this.depthLevels = this.factor * 2;
+        this.compactTextureSize = 128 * this.factor;
+        this.particleSize = 4;
+        this.blurSteps = 12;
+        this.range = 0.36;
         this.maxCells = 3.2;
         this.fastNormals = false;
         this.updateMesh = true;
@@ -4396,17 +4401,17 @@ class Params {
         this.lowGridPartitions = 32;
         this.lowSideBuckets = 8;
         this.sceneSize = 512;       //Requires to be a power of two for mip mapping
-        this.floorTextureSize = 64;
+        this.floorTextureSize = 256;
         this.floorScale = 4;
-        this.killRay = 0.02;
+        this.killRay = 0.1;
         this.updateImage = true;
 
         //Material parameters (dielectric)
-        this.refraction = 1.2;
+        this.refraction = 1.1;
         this.maxIterations = 256;
         this.refractions = 4;
         this.reflections = 3;
-        this.maxStepsPerBounce = 512;
+        this.maxStepsPerBounce = 256;
         this.absorptionColor = [250, 150,152];
         this.dispersion = 0.1;
         this.energyDecay = 0;
@@ -4434,10 +4439,10 @@ class Params {
         this.reflectionPhotons = 0.8;
         this.photonsToEmit = 1;
         this.photonSteps = 1;
-        this.radianceRadius = 5.6;
-        this.radiancePower = 0.25;
+        this.radianceRadius = 2;
+        this.radiancePower = 0.4;
         this.calculateCaustics = true;
-        this.causticsSize = 512;
+        this.causticsSize = 256;
         this.totalPhotons = this.causticsSize * this.causticsSize;
         this.causticSteps = 0;
 
@@ -4498,7 +4503,7 @@ class Camera {
         this.currentMouseY = 0;
 
         this.alpha = 1.0 * Math.PI * 0.5;
-        this.beta = .4 * Math.PI;
+        this.beta = .52 * Math.PI;
         this._alpha = this.alpha;
         this._beta = this.beta;
         this.ratio = 1;
@@ -4621,21 +4626,22 @@ function startUIParams(params) {
 
     //Simulation UI
     let simulationUI = new dat.GUI({ autoPlace: false });
-    simulationUI.domElement.style.display = "none";
+    //simulationUI.domElement.style.display = "none";
     uiContainer.appendChild(simulationUI.domElement);
     let simulationParamsActive = false;
 
+    simulationUI.add(params, "resetSimulation");
     //For the position based fluids
     let  pbfFolder = simulationUI.addFolder('Position Based Fluids');
     pbfFolder.add(params, "deltaTime", 0.0000, 1, 0.0001).name("simulation speed");
     pbfFolder.add(params, "constrainsIterations", 1, 10, 1).name("constrains iterations").step(1);
     pbfFolder.add(params, "updateSimulation").name("update simulation");
-    pbfFolder.add(params, "resetSimulation");
 
     pbfFolder.open();
 
     //For the mesh generation
     let meshFolder = simulationUI.addFolder('Marching Cubes');
+    meshFolder.add(params, "factor", 1, 10, 1).name("factor").step(1);
     meshFolder.add(params, "particleSize", 1, 10, 1).name("particle size").step(1);
     meshFolder.add(params, "blurSteps", 1, 100, 1).name("blur steps").step(1);
     meshFolder.add(params, "range", 0, 1, 0.001).name("range").step(0.001);
@@ -4646,8 +4652,9 @@ function startUIParams(params) {
 
 
     //material UI
-    let materialUI = new dat.GUI({ autoPlace: false });
-    materialUI.domElement.style.display = "none";
+    //let materialUI = new dat.GUI({ autoPlace: false });
+    let materialUI = simulationUI;
+    //materialUI.domElement.style.display = "none";
     uiContainer.appendChild(materialUI.domElement);
     let materialUIActive = false;
 
@@ -4675,12 +4682,11 @@ function startUIParams(params) {
 
 
     //raytracer UI
-    let raytracerUI = new dat.GUI({ autoPlace: false });
-    raytracerUI.domElement.style.display = "none";
+    //let raytracerUI = new dat.GUI({ autoPlace: false });
+    let raytracerUI = simulationUI;
+    //raytracerUI.domElement.style.display = "none";
     uiContainer.appendChild(raytracerUI.domElement);
     let raytracerUiActive = false;
-
-
 
 
     //General raytracer folder
@@ -4694,8 +4700,8 @@ function startUIParams(params) {
 
     //Light parameters folder
     let lightFolder = raytracerUI.addFolder('Light parameters');
-    lightFolder.add(params, "lightAlpha", 0, 180, 1).name("light alpha").step(1);
-    lightFolder.add(params, "lightBeta", 0, 180, 1).name("light beta").step(1);
+    lightFolder.add(params, "lightAlpha", 0, 360, 1).name("light alpha").step(1);
+    lightFolder.add(params, "lightBeta", 0, 360, 1).name("light beta").step(1);
     lightFolder.add(params, "lightDistance", 0, 20, 1).name("light distance").step(1);
     lightFolder.add(params, "backgroundColor", 0, 1, 0.01).name("background color").step(0.01);
     lightFolder.add(params, "shadowIntensity", 0, 1, 0.01).name("shadows intensity").step(0.01);
@@ -4718,9 +4724,9 @@ function startUIParams(params) {
 
        if(e.key == "p") {
            simulationParamsActive = !simulationParamsActive;
-           simulationUI.domElement.style.display = simulationParamsActive ? "block" : "none";
+           uiContainer.style.display = simulationParamsActive ? "block" : "none";
        }
-
+/*
         if(e.key == "m") {
             materialUIActive = !materialUIActive;
             materialUI.domElement.style.display = materialUIActive ? "block" : "none";
@@ -4730,7 +4736,7 @@ function startUIParams(params) {
             raytracerUiActive = !raytracerUiActive;
             raytracerUI.domElement.style.display = raytracerUiActive ? "block" : "none";
         }
-
+*/
     });
 
 }
