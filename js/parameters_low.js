@@ -7,17 +7,17 @@ export class Params {
         this.resetSimulation = resetSimulation;
 
         //Camera parameters
-        this.cameraDistance = 2.8;
+        this.cameraDistance = 2.6;
         this.FOV = 30;
         this.lockCamera = false;
 
         //Position based fluids parameters
         this.updateSimulation = true;
-        this.deltaTime = 0.2;
+        this.deltaTime = 0.036;
         this.constrainsIterations = 5;
-        this.pbfResolution = 64;
+        this.pbfResolution = 32;
         this.voxelTextureSize = 2048;
-        this.particlesTextureSize = 1000;
+        this.particlesTextureSize = 256;
 
         //Marching cubes parameters, Change these values to change marching cubes resolution (128/2048/1024 or 256/4096/2048)
         this.resolution = 64;
@@ -26,11 +26,11 @@ export class Params {
         this.compressedTextureSize = 256;
         this.compressedBuckets = 4;
         this.depthLevels = 16;
-        this.compactTextureSize = 2048;
+        this.compactTextureSize = 1024;
         this.particleSize = 2;
-        this.blurSteps = 24;
-        this.range = 0.1;
-        this.maxCells = 3.5;
+        this.blurSteps = 10;
+        this.range = 0.16;
+        this.maxCells = 3.2;
         this.fastNormals = false;
         this.updateMesh = true;
 
@@ -38,31 +38,30 @@ export class Params {
         this.lowResolutionTextureSize = 256;
         this.lowGridPartitions = 32;
         this.lowSideBuckets = 8;
-        this.sceneSize = 256;       //Requires to be a power of two for mip mapping
-        this.floorTextureSize = 256;
-        this.floorScale = 5;
+        this.sceneSize = 512;       //Requires to be a power of two for mip mapping
+        this.floorTextureSize = 64;
+        this.floorScale = 4;
         this.killRay = 0.02;
         this.updateImage = true;
 
         //Material parameters (dielectric)
         this.refraction = 1.2;
-        this.maxIterations = 600;
-        this.refractions = 8;
+        this.maxIterations = 256;
+        this.refractions = 4;
         this.reflections = 3;
-        this.maxStepsPerBounce = 800;
-        this.absorptionColor = [150, 150, 152];
-        this.dispersion = 0.0;
+        this.maxStepsPerBounce = 512;
+        this.absorptionColor = [250, 150,152];
+        this.dispersion = 0.1;
         this.energyDecay = 0;
         this.distanceAbsorptionScale = 6;
         this.materialColor = [255, 255, 255];
-        this.kS = 0.;
-        this.kD = 0.;
-        this.kA = 0.;
-        this.shinny = 60;
-
+        this.kS = 0.96;
+        this.kD = 0.2;
+        this.kA = 0.08;
+        this.shinny = 30;
 
         //Light parameters
-        this.lightAlpha = 30;
+        this.lightAlpha = 48;
         this.lightBeta = 0;
         this.lightIntensity = 2.5;
         this.lightDistance = 3;
@@ -73,13 +72,13 @@ export class Params {
         this.blurShadowsRadius = 30;
 
         //Caustics parameters
-        this.photonSize = 2;
-        this.photonEnergy = 0.2;
-        this.reflectionPhotons = 0;
+        this.photonSize = 5;
+        this.photonEnergy = 0.16;
+        this.reflectionPhotons = 0.8;
         this.photonsToEmit = 1;
         this.photonSteps = 1;
         this.radianceRadius = 5.6;
-        this.radiancePower = 0.2;
+        this.radiancePower = 0.25;
         this.calculateCaustics = true;
         this.causticsSize = 512;
         this.totalPhotons = this.causticsSize * this.causticsSize;

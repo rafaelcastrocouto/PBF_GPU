@@ -17,7 +17,7 @@ export function startUIParams(params) {
 
     //For the position based fluids
     let  pbfFolder = simulationUI.addFolder('Position Based Fluids');
-    pbfFolder.add(params, "deltaTime", 0.0000, 0.01, 0.0001).name("simulation speed");
+    pbfFolder.add(params, "deltaTime", 0.0000, 1, 0.0001).name("simulation speed");
     pbfFolder.add(params, "constrainsIterations", 1, 10, 1).name("constrains iterations").step(1);
     pbfFolder.add(params, "updateSimulation").name("update simulation");
     pbfFolder.add(params, "resetSimulation");
@@ -27,7 +27,7 @@ export function startUIParams(params) {
     //For the mesh generation
     let meshFolder = simulationUI.addFolder('Marching Cubes');
     meshFolder.add(params, "particleSize", 1, 10, 1).name("particle size").step(1);
-    meshFolder.add(params, "blurSteps", 1, 20, 1).name("spread steps").step(1);
+    meshFolder.add(params, "blurSteps", 1, 100, 1).name("blur steps").step(1);
     meshFolder.add(params, "range", 0, 1, 0.001).name("range").step(0.001);
     meshFolder.add(params, "maxCells", 0, 5, 0.1).name("max cells").step(0.1);
     meshFolder.add(params, "fastNormals").name("fast normals");
@@ -77,8 +77,8 @@ export function startUIParams(params) {
     let raytracerFolder = raytracerUI.addFolder('Ray tracer');
     raytracerFolder.add(params, "floorScale", 1, 15, 1).name("floor scale").step(2);
     raytracerFolder.add(params, "killRay", 0, 1, 0.001).name("kill ray").step(0.001);
-    raytracerFolder.add(params, "maxIterations", 0, 1200, 1).name("max steps").step(1);
-    raytracerFolder.add(params, "maxStepsPerBounce", 0, 1200, 1).name("max bounce steps").step(1);
+    raytracerFolder.add(params, "maxIterations", 0, 1200, 1).name("max iterations").step(1);
+    raytracerFolder.add(params, "maxStepsPerBounce", 0, 1200, 1).name("max steps per bounce").step(1);
     raytracerFolder.add(params, "updateImage").name("update image");
     raytracerFolder.open();
 
@@ -89,7 +89,7 @@ export function startUIParams(params) {
     lightFolder.add(params, "lightDistance", 0, 20, 1).name("light distance").step(1);
     lightFolder.add(params, "backgroundColor", 0, 1, 0.01).name("background color").step(0.01);
     lightFolder.add(params, "shadowIntensity", 0, 1, 0.01).name("shadows intensity").step(0.01);
-    lightFolder.add(params, "blurShadowsRadius", 0, 100, 1).name("shadows spread").step(1);
+    lightFolder.add(params, "blurShadowsRadius", 0, 100, 1).name("shadows blur").step(1);
     lightFolder.add(params, "calculateShadows").name("update shadows");
     lightFolder.addColor(params, 'lightColor');
     lightFolder.open();
