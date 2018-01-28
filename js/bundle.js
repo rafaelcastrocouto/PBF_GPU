@@ -4440,7 +4440,7 @@ class Params {
         this.photonsToEmit = 1;
         this.photonSteps = 1;
         this.radianceRadius = 2;
-        this.radiancePower = 0.4;
+        this.radiancePower = 0.32;
         this.calculateCaustics = true;
         this.causticsSize = 256;
         this.totalPhotons = this.causticsSize * this.causticsSize;
