@@ -7,15 +7,15 @@ export class Params {
         this.resetSimulation = resetSimulation;
 
         //Camera parameters
-        this.cameraDistance = 2;
+        this.cameraDistance = 3;
         this.FOV = 30;
         this.lockCamera = false;
 
         //Position based fluids parameters
         this.updateSimulation = true;
         this.deltaTime = 0.06;
-        this.constrainsIterations = 5;
-        this.pbfResolution = 32;
+        this.constrainsIterations = 8;
+        this.pbfResolution = 16;
         this.voxelTextureSize = 512;
         this.particlesTextureSize = 256;
 
@@ -28,9 +28,9 @@ export class Params {
         this.compressedBuckets = this.factor/2;
         this.depthLevels = this.factor * 2;
         this.compactTextureSize = 128 * this.factor;
-        this.particleSize = 4;
-        this.blurSteps = 12;
-        this.range = 0.64;
+        this.particleSize = 3;
+        this.blurSteps = 10;
+        this.range = 0.2;
         this.maxCells = 3.2;
         this.fastNormals = false;
         this.updateMesh = true;
@@ -93,7 +93,7 @@ export class Params {
         this.totalParticles = 0;
         let particlesPosition = [];
         let particlesVelocity = [];
-        let radius = this.pbfResolution * 0.29;
+        let radius = this.pbfResolution * 0.45;
         //Generate the position and velocity
         for (let i = 0; i < this.pbfResolution; i++) {
             for (let j = 0; j < this.pbfResolution; j++) {
@@ -101,7 +101,7 @@ export class Params {
 
                     //Condition for the particle position and existence
                     let x = i - this.pbfResolution * 0.5;
-                    let y = j - this.pbfResolution * 0.7;
+                    let y = j - this.pbfResolution * 0.5;
                     let z = k - this.pbfResolution * 0.5;
 
                     if (x * x + y * y + z * z < radius * radius && k < this.pbfResolution * 0.4) {

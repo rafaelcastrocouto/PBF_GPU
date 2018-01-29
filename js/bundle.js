@@ -500,17 +500,26 @@ let render = () => {
     lightPos.y = r * Math.cos(lAlpha);
     lightPos.z = r * s * Math.sin(lBeta) + 0.5;
 
-    let acceleration = {
-        x: 0 * Math.sin(currentFrame * Math.PI / 180),
-        y: -10,
-        z: 0 * Math.cos(currentFrame * Math.PI / 180)
-    }
-
 
     if (params.updateSimulation) {
+        let dx = 0;
+        let dz = 0;
+        
+        if(camera.down) {
+          if (!camera.lastalpha) camera.lastalpha = camera.alpha;
+          let disp = camera.alpha - camera.lastalpha;
+          dx = Math.sin(camera.beta) * disp;
+          dz = Math.cos(camera.beta) * disp;
+        }
 
+        let acceleration = {
+            x: 20*dx,// * Math.sin(currentFrame * Math.PI / 180),
+            y: -10 /*+ ( Math.sin(currentFrame) * gy)*/,
+            z: 20*dz// * Math.cos(currentFrame * Math.PI / 180)
+        }
+        //console.log(dx,dy);
         //Update the simulation
-        __WEBPACK_IMPORTED_MODULE_1__positionBasedFluids_pbf_js__["e" /* updateFrame */](acceleration, params.deltaTime, params.constrainsIterations, 1.8 * camera.alpha / (2 * Math.PI));
+        __WEBPACK_IMPORTED_MODULE_1__positionBasedFluids_pbf_js__["e" /* updateFrame */](acceleration, params.deltaTime, params.constrainsIterations, 0/*0.8 * camera.alpha / (2 * Math.PI)*/);
 
         currentFrame++;
     }
@@ -1437,7 +1446,7 @@ uniform sampler2D uTexturePosition;
 uniform sampler2D uNeighbors;
 uniform sampler2D uConstrains;
 uniform vec3  uBucketData;
-uniform float uMouseShake;
+//uniform float uMouseShake;
 uniform float uSearchRadius;
 uniform float uRestDensity;
 uniform float uGradientKernelConstant;
@@ -1531,9 +1540,10 @@ void main() {
     vec3 endPosition = particlePosition + (uGradientKernelConstant / uRestDensity) * deltaPosition;
 
     //Collision handling
-    vec3 center = vec3(uBucketData.y * 0.5) + vec3(0., uMouseShake * uBucketData.y, 0.);
+    //vec3 center = vec3(uBucketData.y * 0.5) ;
+    vec3 center = vec3(uBucketData.y * 0.5);
+    float radius = uBucketData.y * 0.49;
 
-    float radius = float(uBucketData.y) * 0.19;
     vec3 normal = endPosition - center;
     float n = length(normal);
     float distance = n -  radius;
@@ -4370,15 +4380,15 @@ class Params {
         this.resetSimulation = resetSimulation;
 
         //Camera parameters
-        this.cameraDistance = 2;
+        this.cameraDistance = 3;
         this.FOV = 30;
         this.lockCamera = false;
 
         //Position based fluids parameters
         this.updateSimulation = true;
         this.deltaTime = 0.06;
-        this.constrainsIterations = 5;
-        this.pbfResolution = 32;
+        this.constrainsIterations = 8;
+        this.pbfResolution = 16;
         this.voxelTextureSize = 512;
         this.particlesTextureSize = 256;
 
@@ -4391,9 +4401,9 @@ class Params {
         this.compressedBuckets = this.factor/2;
         this.depthLevels = this.factor * 2;
         this.compactTextureSize = 128 * this.factor;
-        this.particleSize = 4;
-        this.blurSteps = 12;
-        this.range = 0.64;
+        this.particleSize = 3;
+        this.blurSteps = 10;
+        this.range = 0.2;
         this.maxCells = 3.2;
         this.fastNormals = false;
         this.updateMesh = true;
@@ -4456,7 +4466,7 @@ class Params {
         this.totalParticles = 0;
         let particlesPosition = [];
         let particlesVelocity = [];
-        let radius = this.pbfResolution * 0.29;
+        let radius = this.pbfResolution * 0.45;
         //Generate the position and velocity
         for (let i = 0; i < this.pbfResolution; i++) {
             for (let j = 0; j < this.pbfResolution; j++) {
@@ -4644,7 +4654,7 @@ function startUIParams(params) {
 
     //For the mesh generation
     let meshFolder = simulationUI.addFolder('Marching Cubes');
-    meshFolder.add(params, "factor", 1, 10, 1).name("factor").step(1);
+    //meshFolder.add(params, "factor", 1, 10, 1).name("factor").step(1);
     meshFolder.add(params, "particleSize", 1, 10, 1).name("particle size").step(1);
     meshFolder.add(params, "blurSteps", 1, 100, 1).name("blur steps").step(1);
     meshFolder.add(params, "range", 0, 1, 0.001).name("range").step(0.001);

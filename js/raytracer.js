@@ -179,17 +179,26 @@ let render = () => {
     lightPos.y = r * Math.cos(lAlpha);
     lightPos.z = r * s * Math.sin(lBeta) + 0.5;
 
-    let acceleration = {
-        x: 0 * Math.sin(currentFrame * Math.PI / 180),
-        y: -10,
-        z: 0 * Math.cos(currentFrame * Math.PI / 180)
-    }
-
 
     if (params.updateSimulation) {
+        let dx = 0;
+        let dz = 0;
+        
+        if(camera.down) {
+          if (!camera.lastalpha) camera.lastalpha = camera.alpha;
+          let disp = camera.alpha - camera.lastalpha;
+          dx = Math.sin(camera.beta) * disp;
+          dz = Math.cos(camera.beta) * disp;
+        }
 
+        let acceleration = {
+            x: 20*dx, // * Math.sin(currentFrame * Math.PI / 180),
+            y: -10,   // ( Math.sin(currentFrame) * gy),
+            z: 20*dz  // * Math.cos(currentFrame * Math.PI / 180)
+        }
+        //console.log(dx,dy);
         //Update the simulation
-        PBF.updateFrame(acceleration, params.deltaTime, params.constrainsIterations, 1.8 * camera.alpha / (2 * Math.PI));
+        PBF.updateFrame(acceleration, params.deltaTime, params.constrainsIterations, 0/*0.8 * camera.alpha / (2 * Math.PI)*/);
 
         currentFrame++;
     }

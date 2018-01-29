@@ -7,7 +7,7 @@ uniform sampler2D uTexturePosition;
 uniform sampler2D uNeighbors;
 uniform sampler2D uConstrains;
 uniform vec3  uBucketData;
-uniform float uMouseShake;
+//uniform float uMouseShake;
 uniform float uSearchRadius;
 uniform float uRestDensity;
 uniform float uGradientKernelConstant;
@@ -101,9 +101,10 @@ void main() {
     vec3 endPosition = particlePosition + (uGradientKernelConstant / uRestDensity) * deltaPosition;
 
     //Collision handling
-    vec3 center = vec3(uBucketData.y * 0.5) + vec3(0., uMouseShake * uBucketData.y, 0.);
+    //vec3 center = vec3(uBucketData.y * 0.5) ;
+    vec3 center = vec3(uBucketData.y * 0.5);
+    float radius = uBucketData.y * 0.49;
 
-    float radius = float(uBucketData.y) * 0.19;
     vec3 normal = endPosition - center;
     float n = length(normal);
     float distance = n -  radius;

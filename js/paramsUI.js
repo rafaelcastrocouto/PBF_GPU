@@ -26,7 +26,7 @@ export function startUIParams(params) {
 
     //For the mesh generation
     let meshFolder = simulationUI.addFolder('Marching Cubes');
-    meshFolder.add(params, "factor", 1, 10, 1).name("factor").step(1);
+    //meshFolder.add(params, "factor", 1, 10, 1).name("factor").step(1);
     meshFolder.add(params, "particleSize", 1, 10, 1).name("particle size").step(1);
     meshFolder.add(params, "blurSteps", 1, 100, 1).name("blur steps").step(1);
     meshFolder.add(params, "range", 0, 1, 0.001).name("range").step(0.001);
