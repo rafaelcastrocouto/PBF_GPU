@@ -422,9 +422,8 @@ __WEBPACK_IMPORTED_MODULE_0__webGL_webGL2_js__["e" /* gl */].bindTexture(__WEBPA
 __WEBPACK_IMPORTED_MODULE_0__webGL_webGL2_js__["e" /* gl */].generateMipmap(__WEBPACK_IMPORTED_MODULE_0__webGL_webGL2_js__["e" /* gl */].TEXTURE_2D);
 __WEBPACK_IMPORTED_MODULE_0__webGL_webGL2_js__["e" /* gl */].bindTexture(__WEBPACK_IMPORTED_MODULE_0__webGL_webGL2_js__["e" /* gl */].TEXTURE_2D, null);
 
-
 //Initiate the position based fluids solver
-__WEBPACK_IMPORTED_MODULE_1__positionBasedFluids_pbf_js__["a" /* init */](particlesData.particlesPosition, particlesData.particlesVelocity, params.pbfResolution, Math.ceil(Math.sqrt(Math.pow(params.resolution, 3))), Math.ceil(Math.sqrt(params.totalParticles)));
+__WEBPACK_IMPORTED_MODULE_1__positionBasedFluids_pbf_js__["a" /* init */](particlesData.particlesPosition, particlesData.particlesVelocity, params.pbfResolution, /*params.voxelTextureSize, params.particlesTextureSize*/Math.ceil(Math.sqrt(Math.pow(params.resolution, 3))), Math.ceil(Math.sqrt(params.totalParticles)));
 
 //Initiate the mesher generator
 __WEBPACK_IMPORTED_MODULE_2__marchingCubes_mesher_js__["c" /* init */](params.resolution, params.expandedTextureSize, params.compressedTextureSize, params.compactTextureSize, params.compressedBuckets, params.expandedBuckets, params.depthLevels);
@@ -513,9 +512,9 @@ let render = () => {
         }
 
         let acceleration = {
-            x: 20*dx,// * Math.sin(currentFrame * Math.PI / 180),
-            y: -10 /*+ ( Math.sin(currentFrame) * gy)*/,
-            z: 20*dz// * Math.cos(currentFrame * Math.PI / 180)
+            x: 20*dx, // * Math.sin(currentFrame * Math.PI / 180),
+            y: -10,   // ( Math.sin(currentFrame) * gy),
+            z: 20*dz  // * Math.cos(currentFrame * Math.PI / 180)
         }
         //console.log(dx,dy);
         //Update the simulation
@@ -4403,7 +4402,7 @@ class Params {
         this.compactTextureSize = 128 * this.factor;
         this.particleSize = 3;
         this.blurSteps = 10;
-        this.range = 0.2;
+        this.range = 0.24;
         this.maxCells = 3.2;
         this.fastNormals = false;
         this.updateMesh = true;

@@ -30,7 +30,7 @@ export class Params {
         this.compactTextureSize = 128 * this.factor;
         this.particleSize = 3;
         this.blurSteps = 10;
-        this.range = 0.2;
+        this.range = 0.24;
         this.maxCells = 3.2;
         this.fastNormals = false;
         this.updateMesh = true;

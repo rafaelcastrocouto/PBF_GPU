@@ -101,9 +101,8 @@ gl.bindTexture(gl.TEXTURE_2D, tFloorLines);
 gl.generateMipmap(gl.TEXTURE_2D);
 gl.bindTexture(gl.TEXTURE_2D, null);
 
-
 //Initiate the position based fluids solver
-PBF.init(particlesData.particlesPosition, particlesData.particlesVelocity, params.pbfResolution, Math.ceil(Math.sqrt(Math.pow(params.resolution, 3))), Math.ceil(Math.sqrt(params.totalParticles)));
+PBF.init(particlesData.particlesPosition, particlesData.particlesVelocity, params.pbfResolution, /*params.voxelTextureSize, params.particlesTextureSize*/Math.ceil(Math.sqrt(Math.pow(params.resolution, 3))), Math.ceil(Math.sqrt(params.totalParticles)));
 
 //Initiate the mesher generator
 Mesher.init(params.resolution, params.expandedTextureSize, params.compressedTextureSize, params.compactTextureSize, params.compressedBuckets, params.expandedBuckets, params.depthLevels);
