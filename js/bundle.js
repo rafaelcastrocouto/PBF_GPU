@@ -4370,7 +4370,7 @@ class Params {
         this.resetSimulation = resetSimulation;
 
         //Camera parameters
-        this.cameraDistance = 3;
+        this.cameraDistance = 2;
         this.FOV = 30;
         this.lockCamera = false;
 
@@ -4393,7 +4393,7 @@ class Params {
         this.compactTextureSize = 128 * this.factor;
         this.particleSize = 4;
         this.blurSteps = 12;
-        this.range = 0.36;
+        this.range = 0.64;
         this.maxCells = 3.2;
         this.fastNormals = false;
         this.updateMesh = true;
@@ -4456,7 +4456,7 @@ class Params {
         this.totalParticles = 0;
         let particlesPosition = [];
         let particlesVelocity = [];
-        let radius = this.pbfResolution * 0.25;
+        let radius = this.pbfResolution * 0.29;
         //Generate the position and velocity
         for (let i = 0; i < this.pbfResolution; i++) {
             for (let j = 0; j < this.pbfResolution; j++) {
@@ -4464,7 +4464,7 @@ class Params {
 
                     //Condition for the particle position and existence
                     let x = i - this.pbfResolution * 0.5;
-                    let y = j - this.pbfResolution * 0.7;
+                    let y = j - this.pbfResolution * 0.5;
                     let z = k - this.pbfResolution * 0.5;
 
                     if (x * x + y * y + z * z < radius * radius && k < this.pbfResolution * 0.4) {
