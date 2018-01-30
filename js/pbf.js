@@ -53,7 +53,7 @@ let relaxParameter = .05;  //<<<------------------------------------------- this
 let tensileConstant = 40;
 let tensilePower = 4;
 let tensileDistanceMultiplier = 0.3;
-let viscosity = 0.1;
+let viscosity = 0.05;
 let totalParticles = 0;
 
 

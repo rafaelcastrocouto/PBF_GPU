@@ -487,7 +487,7 @@ let render = () => {
     stats.begin();
     requestAnimationFrame(render);
 
-    if(!params.lockCamera) camera.updateCamera(params.FOV, 1, params.cameraDistance);
+    camera.updateCamera(params.FOV, 1, params.cameraDistance, params.lockCamera);
 
     //Calculate the light position
     let lightPos = {x: 0, y: 0, z: 0};
@@ -503,18 +503,18 @@ let render = () => {
     if (params.updateSimulation) {
         let dx = 0;
         let dz = 0;
-        
-        if(camera.down) {
-          if (!camera.lastalpha) camera.lastalpha = camera.alpha;
-          let disp = camera.alpha - camera.lastalpha;
+
+        if(camera.down && params.interaction) {
+          if (!camera.pMouseY) camera.pMouseY = camera.currentMouseY;
+          let disp = (camera.currentMouseY - camera.pMouseY);
           dx = Math.sin(camera.beta) * disp;
           dz = Math.cos(camera.beta) * disp;
         }
 
         let acceleration = {
-            x: 20*dx, // * Math.sin(currentFrame * Math.PI / 180),
+            x: -dx/10, // * Math.sin(currentFrame * Math.PI / 180),
             y: -10,   // ( Math.sin(currentFrame) * gy),
-            z: 20*dz  // * Math.cos(currentFrame * Math.PI / 180)
+            z: -dz/10  // * Math.cos(currentFrame * Math.PI / 180)
         }
         //console.log(dx,dy);
         //Update the simulation
@@ -4401,8 +4401,8 @@ class Params {
         this.depthLevels = this.factor * 2;
         this.compactTextureSize = 128 * this.factor;
         this.particleSize = 3;
-        this.blurSteps = 10;
-        this.range = 0.24;
+        this.blurSteps = 6;
+        this.range = 0.22;
         this.maxCells = 3.2;
         this.fastNormals = false;
         this.updateMesh = true;
@@ -4423,15 +4423,15 @@ class Params {
         this.refractions = 4;
         this.reflections = 3;
         this.maxStepsPerBounce = 256;
-        this.absorptionColor = [250, 150,152];
+        this.absorptionColor = [220, 225, 232];
         this.dispersion = 0.1;
         this.energyDecay = 0;
-        this.distanceAbsorptionScale = 6;
+        this.distanceAbsorptionScale = 10;
         this.materialColor = [255, 255, 255];
         this.kS = 0.96;
         this.kD = 0.2;
         this.kA = 0.08;
-        this.shinny = 30;
+        this.shinny = 50;
 
         //Light parameters
         this.lightAlpha = 48;
@@ -4456,6 +4456,8 @@ class Params {
         this.causticsSize = 256;
         this.totalPhotons = this.causticsSize * this.causticsSize;
         this.causticSteps = 0;
+        
+        this.interaction = true;
 
     }
 
@@ -4514,7 +4516,7 @@ class Camera {
         this.currentMouseX = 0;
         this.currentMouseY = 0;
 
-        this.alpha = 1.0 * Math.PI * 0.5;
+        this.alpha = .92 * Math.PI * 0.5;
         this.beta = .52 * Math.PI;
         this._alpha = this.alpha;
         this._beta = this.beta;
@@ -4548,26 +4550,27 @@ class Camera {
         }, false);
     }
 
-    updateCamera(perspective, aspectRatio, radius) {
+    updateCamera(perspective, aspectRatio, radius, lockCamera) {
+       if(!lockCamera) {
+           this.ratio = radius;
 
-       this.ratio = radius;
+            mat4.perspective(this.perspectiveMatrix, perspective * Math.PI / 180, aspectRatio, 0.01, 10);
 
-        mat4.perspective(this.perspectiveMatrix, perspective * Math.PI / 180, aspectRatio, 0.01, 10);
+            if (this.down) {
+                this.alpha -= 0.1 * (this.currentMouseY - this.prevMouseY) * Math.PI / 180;
+                this.beta += 0.1 * (this.currentMouseX - this.prevMouseX) * Math.PI / 180;
+                if (this.alpha <= 0.3) this.alpha = 0.31;
+                if (this.alpha >= 0.55 * Math.PI) this.alpha = 0.55 * Math.PI;
+            }
 
-        if (this.down) {
-            this.alpha -= 0.1 * (this.currentMouseY - this.prevMouseY) * Math.PI / 180;
-            this.beta += 0.1 * (this.currentMouseX - this.prevMouseX) * Math.PI / 180;
-            if (this.alpha <= 0) this.alpha = 0.001;
-            if (this.alpha >= 0.99 *  Math.PI) this.alpha = 0.99 * Math.PI;
-        }
-
-        if (this._alpha != this.alpha || this._beta != this.beta || this.init) {
-            this._alpha += (this.alpha - this._alpha) / 7;
-            this._beta += (this.beta - this._beta) / 7;
-            this.position[0] = this.ratio * Math.sin(this._alpha) * Math.sin(this._beta) + this.target[0];
-            this.position[1] = this.ratio * Math.cos(this._alpha) + this.target[1];
-            this.position[2] = this.ratio * Math.sin(this._alpha) * Math.cos(this._beta) + this.target[2];
-            this.cameraTransformMatrix = this.defineTransformMatrix(this.position, this.target);
+            if (this._alpha != this.alpha || this._beta != this.beta || this.init) {
+                this._alpha += (this.alpha - this._alpha) / 7;
+                this._beta += (this.beta - this._beta) / 7;
+                this.position[0] = this.ratio * Math.sin(this._alpha) * Math.sin(this._beta) + this.target[0];
+                this.position[1] = this.ratio * Math.cos(this._alpha) + this.target[1];
+                this.position[2] = this.ratio * Math.sin(this._alpha) * Math.cos(this._beta) + this.target[2];
+                this.cameraTransformMatrix = this.defineTransformMatrix(this.position, this.target);
+            }
         }
         this.prevMouseX = this.currentMouseX;
         this.prevMouseY = this.currentMouseY;
@@ -4642,25 +4645,25 @@ function startUIParams(params) {
     uiContainer.appendChild(simulationUI.domElement);
     let simulationParamsActive = false;
 
-    simulationUI.add(params, "resetSimulation");
+    
     //For the position based fluids
     let  pbfFolder = simulationUI.addFolder('Position Based Fluids');
     pbfFolder.add(params, "deltaTime", 0.0000, 1, 0.0001).name("simulation speed");
-    pbfFolder.add(params, "constrainsIterations", 1, 10, 1).name("constrains iterations").step(1);
+    pbfFolder.add(params, "constrainsIterations", 1, 30, 1).name("constrains iterations").step(1);
     pbfFolder.add(params, "updateSimulation").name("update simulation");
 
-    pbfFolder.open();
+    //pbfFolder.open();
 
     //For the mesh generation
     let meshFolder = simulationUI.addFolder('Marching Cubes');
     //meshFolder.add(params, "factor", 1, 10, 1).name("factor").step(1);
     meshFolder.add(params, "particleSize", 1, 10, 1).name("particle size").step(1);
-    meshFolder.add(params, "blurSteps", 1, 100, 1).name("blur steps").step(1);
+    meshFolder.add(params, "blurSteps", 1, 32, 1).name("blur steps").step(1);
     meshFolder.add(params, "range", 0, 1, 0.001).name("range").step(0.001);
-    meshFolder.add(params, "maxCells", 0, 5, 0.1).name("max cells").step(0.1);
+    //meshFolder.add(params, "maxCells", 0, 5, 0.1).name("max cells").step(0.1);
     meshFolder.add(params, "fastNormals").name("fast normals");
-    meshFolder.add(params, "updateMesh").name("update mesh");
-    meshFolder.open();
+    //meshFolder.add(params, "updateMesh").name("update mesh");
+    //meshFolder.open();
 
 
     //material UI
@@ -4673,24 +4676,25 @@ function startUIParams(params) {
 
     //For the mesh generation
     let materialFolder = materialUI.addFolder('Material Definition');
-    materialFolder.add(params, "refraction", 0, 10, 0.1).name("refraction").step(0.1);
-    materialFolder.add(params, "refractions", 0, 20, 0.1).name("refraction steps").step(1);
-    materialFolder.add(params, "reflections", 0, 20, 0.1).name("reflection steps").step(1);
-    materialFolder.add(params, "distanceAbsorptionScale", 0, 10, 1).name("absorption scale").step(1);
+    materialFolder.add(params, "refraction", 0, 2, 0.1).name("refraction").step(0.1);
+    materialFolder.add(params, "refractions", 0, 10, 1).name("refraction").step(1);
+    //materialFolder.add(params, "reflections", 0, 20, 0.1).name("reflection steps").step(1);
+    materialFolder.add(params, "distanceAbsorptionScale", 0, 20, 1).name("absorption").step(1);
     materialFolder.add(params, "kS", 0, 1, 0.001).name("specular intensity").step(0.001);
     materialFolder.add(params, "kD", 0, 1, 0.001).name("diffuse intensity").step(0.001);
-    materialFolder.add(params, "kA", 0, 1, 0.001).name("ambient intensity").step(0.001);
-    materialFolder.add(params, "shinny", 0, 60, 1).name("specular power").step(1);
+    //materialFolder.add(params, "kA", 0, 1, 0.001).name("ambient intensity").step(0.001);
+    materialFolder.add(params, "shinny", 1, 100, 1).name("specular power").step(1);
     materialFolder.add(params, "dispersion", 0, 0.2, 0.0001).name("dispersion").step(0.0001);
-    materialFolder.add(params, "photonSize", 1, 10, 1).name("photons size").step(1);
-    materialFolder.add(params, "photonEnergy", 0, 1, 0.001).name("photons energy").step(0.001);
-    materialFolder.add(params, "reflectionPhotons", 0, 1, 0.001).name("reflection photons").step(0.01);
-    materialFolder.add(params, "radianceRadius", 0, 30, 0.1).name("radiance radius").step(0.1);
-    materialFolder.add(params, "radiancePower", 0, 1, 0.01).name("radiance power").step(0.01);
-    materialFolder.add(params, "calculateCaustics").name("update caustics");
-    materialFolder.addColor(params, 'absorptionColor');
-    materialFolder.addColor(params, 'materialColor');
-    materialFolder.open();
+    let causticsFolder = materialUI.addFolder('Caustics Definition');
+    causticsFolder.add(params, "photonSize", 1, 10, 1).name("photons size").step(1);
+    causticsFolder.add(params, "photonEnergy", 0, 1, 0.001).name("photons energy").step(0.001);
+    causticsFolder.add(params, "reflectionPhotons", 0, 1, 0.001).name("reflection photons").step(0.01);
+    causticsFolder.add(params, "radianceRadius", 0, 30, 0.1).name("radiance radius").step(0.1);
+    causticsFolder.add(params, "radiancePower", 0, 1, 0.01).name("radiance power").step(0.01);
+    causticsFolder.add(params, "calculateCaustics").name("update caustics");
+    //causticsFolder.addColor(params, 'absorptionColor');
+    //causticsFolder.addColor(params, 'materialColor');
+    
 
 
     //raytracer UI
@@ -4705,10 +4709,10 @@ function startUIParams(params) {
     let raytracerFolder = raytracerUI.addFolder('Ray tracer');
     raytracerFolder.add(params, "floorScale", 1, 15, 1).name("floor scale").step(2);
     raytracerFolder.add(params, "killRay", 0, 1, 0.001).name("kill ray").step(0.001);
-    raytracerFolder.add(params, "maxIterations", 0, 1200, 1).name("max iterations").step(1);
-    raytracerFolder.add(params, "maxStepsPerBounce", 0, 1200, 1).name("max steps per bounce").step(1);
+    //raytracerFolder.add(params, "maxIterations", 0, 1200, 1).name("max iterations").step(1);
+    //raytracerFolder.add(params, "maxStepsPerBounce", 0, 1200, 1).name("max steps per bounce").step(1);
     raytracerFolder.add(params, "updateImage").name("update image");
-    raytracerFolder.open();
+    //raytracerFolder.open();
 
     //Light parameters folder
     let lightFolder = raytracerUI.addFolder('Light parameters');
@@ -4719,26 +4723,28 @@ function startUIParams(params) {
     lightFolder.add(params, "shadowIntensity", 0, 1, 0.01).name("shadows intensity").step(0.01);
     lightFolder.add(params, "blurShadowsRadius", 0, 100, 1).name("shadows blur").step(1);
     lightFolder.add(params, "calculateShadows").name("update shadows");
-    lightFolder.addColor(params, 'lightColor');
-    lightFolder.open();
+    //lightFolder.addColor(params, 'lightColor');
+    //lightFolder.open();
 
 
     //Light parameters folder
     let cameraFolder = raytracerUI.addFolder('camera parameters');
-    cameraFolder.add(params, "cameraDistance", 1, 10, 1).name("camera distance").step(1);
-    cameraFolder.add(params, "FOV", 1, 70, 1).name("FOV").step(1);
+    cameraFolder.add(params, "cameraDistance", 1, 10, 0.1).name("camera distance").step(1);
+    //cameraFolder.add(params, "FOV", 1, 70, 1).name("FOV").step(1);
     cameraFolder.add(params, "lockCamera").name("camera lock");
+    cameraFolder.add(params, "interaction").name("interaction");
+    cameraFolder.add(params, "resetSimulation");
     cameraFolder.open();
 
 
     //Function used to show the different UI params
-    document.body.addEventListener("keypress", (e) => {
+ /*   document.body.addEventListener("keypress", (e) => {
 
        if(e.key == "p") {
            simulationParamsActive = !simulationParamsActive;
            uiContainer.style.display = simulationParamsActive ? "block" : "none";
        }
-/*
+
         if(e.key == "m") {
             materialUIActive = !materialUIActive;
             materialUI.domElement.style.display = materialUIActive ? "block" : "none";
@@ -4748,8 +4754,8 @@ function startUIParams(params) {
             raytracerUiActive = !raytracerUiActive;
             raytracerUI.domElement.style.display = raytracerUiActive ? "block" : "none";
         }
-*/
-    });
+
+    });*/
 
 }
 

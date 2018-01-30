@@ -29,8 +29,8 @@ export class Params {
         this.depthLevels = this.factor * 2;
         this.compactTextureSize = 128 * this.factor;
         this.particleSize = 3;
-        this.blurSteps = 10;
-        this.range = 0.24;
+        this.blurSteps = 6;
+        this.range = 0.22;
         this.maxCells = 3.2;
         this.fastNormals = false;
         this.updateMesh = true;
@@ -51,15 +51,15 @@ export class Params {
         this.refractions = 4;
         this.reflections = 3;
         this.maxStepsPerBounce = 256;
-        this.absorptionColor = [250, 150,152];
+        this.absorptionColor = [220, 225, 232];
         this.dispersion = 0.1;
         this.energyDecay = 0;
-        this.distanceAbsorptionScale = 6;
+        this.distanceAbsorptionScale = 10;
         this.materialColor = [255, 255, 255];
         this.kS = 0.96;
         this.kD = 0.2;
         this.kA = 0.08;
-        this.shinny = 30;
+        this.shinny = 50;
 
         //Light parameters
         this.lightAlpha = 48;
@@ -84,6 +84,8 @@ export class Params {
         this.causticsSize = 256;
         this.totalPhotons = this.causticsSize * this.causticsSize;
         this.causticSteps = 0;
+        
+        this.interaction = true;
 
     }
 

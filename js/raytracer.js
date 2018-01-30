@@ -166,7 +166,7 @@ let render = () => {
     stats.begin();
     requestAnimationFrame(render);
 
-    if(!params.lockCamera) camera.updateCamera(params.FOV, 1, params.cameraDistance);
+    camera.updateCamera(params.FOV, 1, params.cameraDistance, params.lockCamera);
 
     //Calculate the light position
     let lightPos = {x: 0, y: 0, z: 0};
@@ -182,18 +182,18 @@ let render = () => {
     if (params.updateSimulation) {
         let dx = 0;
         let dz = 0;
-        
-        if(camera.down) {
-          if (!camera.lastalpha) camera.lastalpha = camera.alpha;
-          let disp = camera.alpha - camera.lastalpha;
+
+        if(camera.down && params.interaction) {
+          if (!camera.pMouseY) camera.pMouseY = camera.currentMouseY;
+          let disp = (camera.currentMouseY - camera.pMouseY);
           dx = Math.sin(camera.beta) * disp;
           dz = Math.cos(camera.beta) * disp;
         }
 
         let acceleration = {
-            x: 20*dx, // * Math.sin(currentFrame * Math.PI / 180),
+            x: -dx/10, // * Math.sin(currentFrame * Math.PI / 180),
             y: -10,   // ( Math.sin(currentFrame) * gy),
-            z: 20*dz  // * Math.cos(currentFrame * Math.PI / 180)
+            z: -dz/10  // * Math.cos(currentFrame * Math.PI / 180)
         }
         //console.log(dx,dy);
         //Update the simulation

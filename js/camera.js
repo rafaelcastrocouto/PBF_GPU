@@ -9,7 +9,7 @@ class Camera {
         this.currentMouseX = 0;
         this.currentMouseY = 0;
 
-        this.alpha = 1.0 * Math.PI * 0.5;
+        this.alpha = .92 * Math.PI * 0.5;
         this.beta = .52 * Math.PI;
         this._alpha = this.alpha;
         this._beta = this.beta;
@@ -43,26 +43,27 @@ class Camera {
         }, false);
     }
 
-    updateCamera(perspective, aspectRatio, radius) {
+    updateCamera(perspective, aspectRatio, radius, lockCamera) {
+       if(!lockCamera) {
+           this.ratio = radius;
 
-       this.ratio = radius;
+            mat4.perspective(this.perspectiveMatrix, perspective * Math.PI / 180, aspectRatio, 0.01, 10);
 
-        mat4.perspective(this.perspectiveMatrix, perspective * Math.PI / 180, aspectRatio, 0.01, 10);
+            if (this.down) {
+                this.alpha -= 0.1 * (this.currentMouseY - this.prevMouseY) * Math.PI / 180;
+                this.beta += 0.1 * (this.currentMouseX - this.prevMouseX) * Math.PI / 180;
+                if (this.alpha <= 0.3) this.alpha = 0.31;
+                if (this.alpha >= 0.55 * Math.PI) this.alpha = 0.55 * Math.PI;
+            }
 
-        if (this.down) {
-            this.alpha -= 0.1 * (this.currentMouseY - this.prevMouseY) * Math.PI / 180;
-            this.beta += 0.1 * (this.currentMouseX - this.prevMouseX) * Math.PI / 180;
-            if (this.alpha <= 0) this.alpha = 0.001;
-            if (this.alpha >= 0.99 *  Math.PI) this.alpha = 0.99 * Math.PI;
-        }
-
-        if (this._alpha != this.alpha || this._beta != this.beta || this.init) {
-            this._alpha += (this.alpha - this._alpha) / 7;
-            this._beta += (this.beta - this._beta) / 7;
-            this.position[0] = this.ratio * Math.sin(this._alpha) * Math.sin(this._beta) + this.target[0];
-            this.position[1] = this.ratio * Math.cos(this._alpha) + this.target[1];
-            this.position[2] = this.ratio * Math.sin(this._alpha) * Math.cos(this._beta) + this.target[2];
-            this.cameraTransformMatrix = this.defineTransformMatrix(this.position, this.target);
+            if (this._alpha != this.alpha || this._beta != this.beta || this.init) {
+                this._alpha += (this.alpha - this._alpha) / 7;
+                this._beta += (this.beta - this._beta) / 7;
+                this.position[0] = this.ratio * Math.sin(this._alpha) * Math.sin(this._beta) + this.target[0];
+                this.position[1] = this.ratio * Math.cos(this._alpha) + this.target[1];
+                this.position[2] = this.ratio * Math.sin(this._alpha) * Math.cos(this._beta) + this.target[2];
+                this.cameraTransformMatrix = this.defineTransformMatrix(this.position, this.target);
+            }
         }
         this.prevMouseX = this.currentMouseX;
         this.prevMouseY = this.currentMouseY;
